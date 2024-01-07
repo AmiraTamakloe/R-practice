@@ -1,0 +1,2 @@
+"0","#Droite de Henry"
+"0","qqnorm(mondata$mpg, col=""lightblue"", main=paste(""Droite de Henry pour l'efficacité en carburant du véhicule""), xlab=""Quantile théorique"",ylab=""Quantile réelle"")"

@@ -1,0 +1,3 @@
+"0","#Histogramme"
+"0","hist(mondata$mpg, col=""pink"",border=""black"", main=paste(""Histogramme de l'efficacité en caburant""),"
+"0","     xlab=""L’efficacité en carburant du véhicule (en milles par gallon)"",ylab=""Fréquence"")"

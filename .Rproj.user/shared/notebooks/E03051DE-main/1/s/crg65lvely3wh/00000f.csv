@@ -1,0 +1,2 @@
+"0","#Diagramme de Tukey"
+"0","boxplot(mondata$weight,col=""lightgreen"", horizontal=TRUE, main=paste(""Diagrame de Turkey pour le poids du véhicule""), xlab=""Le poids du véhicule (en livres)"")"

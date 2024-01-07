@@ -1,0 +1,504 @@
+---
+title: "MTH2302D : Devoir"
+author: "Amira Tamakloe"
+lang: fr
+output: 
+  pdf_document: default 
+  html_document: default
+---
+
+```{r}
+source('charger.R') 
+mondata<-charger(2131198)
+```
+
+Phase 1 : Analyse statistique descriptive et inférence
+```{r}
+# Matrice de corrélation des 3 variables (mpg, displacement et weight)
+mondataSubset  <- mondata[ , c("mpg", "displacement", "weight")]
+cor(mondataSubset)
+```
+Un test de corrélation comme effectué avec la formule cor() détermine la dépendance entre plusieurs variables. Dans notre cas, nous nous intéressons à la dépendance entre trois variables soient mpg, displacement et weight. Dans notre cas, le test de corrélation effectué pour les 3 variables est celui de pearson puisqu'il est le test effectué par défaut. Une valeur de 1 dans la matrice signifie que la corrélation entre deux variables est parfaite et plus celle-ci se rapproche de 1 plus elle est dépandante. Ainsi, la valeur du test détermine la force de leur dépendance. Le signe par contre obtenu, c'est-à-dire qu'il soit positif ou négatif détermine le sens de variation des deux variables auxquels. Si la valeur est négative, les deux variables évoluent dans deux sens différent, c'est-à-dire que lorsqu'une d'entre elle diminue l'autre augment. Si le signe est positif, les deux augmentent ou diminuent ensemble. On en conclut ainsi que la variable mpg à une corrélation quand même forte avec les deux autres variables mais elles évoluent dans des sens différents. La variable de displacement évolue dans le même sens que le poid et leur corrélation est très forte.
+
+
+Phase 1.b
+Graphique et tableaux associés à la variable d'efficacité du carburant 
+```{r}
+#Histogramme
+hist(mondata$mpg, col="pink",border="black", main=paste("Histogramme de l'efficacité en caburant"),
+     xlab="L’efficacité en carburant du véhicule (en milles par gallon)",ylab="Fréquence")
+```
+L'histogramme montre que l'étalement des données de l'efficacité en carburant du véhicule est étale de 10 milles/galon à 50 milles/gallon. On s'aperçoit aussi la fréquence des données est plus grande lorsque l'on se situe vers la gauche c'est à dire, une efficacité en carburant du véhicule en milles/gallon plus faible. Ainsi, la majorité des données se situent à l'extrémité gauche. On peut estimer que la moyenne sera un peu plus que 20 milles/gallon.
+```{r}
+#Diagramme de Tukey
+boxplot(mondata$mpg,col="lightpink", horizontal=TRUE,notch=TRUE, main=paste("Diagrame de Turkey pour l'efficacité en carburant du véhicule"), xlab="L’efficacité en carburant du véhicule (en milles par gallon)")
+```
+Le diagramme de Tukey montre que la valeur minimale de l'efficacité en carburant du véhicule en milles/gallon est de 10 et que sa valeur maximale est un peu en dessous de 50 milles/gallon. La médiane de l'efficacité avoisine 23 milles/gallon. Tandis que celle du premier quartile est en dessous de 20, à peu près 18 milles/gallon et celle du troisième quartile est très près de 30 milles/gallon. La distribution est à peu près symétrique, car la portion droite de la boîte et la moustache droite sont à peu près égale à celle de gauche.
+```{r}
+#Droite de Henry
+qqnorm(mondata$mpg, col="lightblue", main=paste("Droite de Henry pour l'efficacité en carburant du véhicule"), xlab="Quantile théorique",ylab="Quantile réelle")
+qqline(mondata$mpg, col="red", lwd=2)
+```
+La droite de Henry nous permet d'évaluer la normalité de la distribution. On s'aperçoit que les données sont majoritairement sur la line rouge, ce qui signifie que la majorité des valeurs suivent une loi normal. Cependant, on peut aperçevoir quelques valeurs à l'extrémité gauche qui ne touchent pas la droite. Pour confirmer mon hypothèse que les données suivent une loi normal malgré les quelques données aberrantes à l'extrémité gauche, il est possible de faire d'autres tests comme celui de shapiro pour en avoir la certitude.
+
+```{r}
+#Test de Shapiro
+shapiro.test(mondata$mpg)
+```
+Le test de Shapiro nous renseigne sur la normalité de la variable en question c'est à dire l'efficacité en carburant du véhicule. La valeur de p obtenue est 0.0005895 est inférieure à 0.05 ce qui signifie que nous ne pouvons pas supposer la normalité. Ainsi, on contredit l'hypothèse posé précèdement. L'hypothèse sur la normalité est rejetté, ainsi la variable ne suit pas une loi normale. 
+
+```{r}
+#Statistiques descriptives
+Quartile <- quantile(mondata$mpg , c(0.25,0.5,0.75))
+Moyenne <- mean(mondata$mpg) 
+ÉcartType <- sd(mondata$mpg)
+ErreurType <- ÉcartType/ sqrt(length(mondata$mpg))
+quantile(mondata$mpg,c(.05,.95))
+InterValleDeConfiance <- t.test(mondata$mpg, conf.level = 0.95)
+InterValleDeConfiance.min = c(13.000)
+InterValleDeConfiance.max = c(37.225)
+table <- data.frame( Moyenne=Moyenne,
+      "Écart Type"= ÉcartType ,
+      "Erreur Type"= ErreurType,
+      "min IDC" = InterValleDeConfiance.min,
+      "max IDC"= InterValleDeConfiance.max,
+      "p25"= Quartile[1],
+      "Mediane"= Quartile[2],
+      "p75"= Quartile[3],
+      row.names = "mpg")
+table
+```
+La moyenne est un indicateur de position d'un échantillon car c'est la valeur unique que tous devrait avoir pour que leur total soit inchangé. Dans notre cas elle est de 23.97455. L'écart type quant à lui représente la dispersion des données autour de la moyenne et dans notre cas celui-ci est de 7.8 milles/gallon. L'écart type est élevés donc les données sont très dispersés. L'erreur type représente l'écart approximatif d'un échantillon et puisque 0.526055 est faible alors l'estimation de la moyenne est précise. L'intervalle de confiance à un niveau de confiance de 95% ce qui veut dire que la moyenne de l'efficacité en carburant se situe à 95% entre les deux valeurs de min.IDC et max.IDC. Ainsi, cette valeur se situe entre 13 et 37.225. Les quartiles sont respectivement p25 qui représentent 25% de l'échantillon est à 18 milles/gallon, la médiane qui représente le point milieu d'un échantillon est de 23.6, le p75 représentent 75% de la population et est fixé à 29.5 mille/gallon.
+
+
+Graphique et tableaux associés à la cylindrée du moteur du véhicule :
+```{r}
+#histogramme
+hist(mondata$displacement, col="blue",border="black", main=paste("Histogramme de La cylindrée du moteur du véhicule"),
+     xlab="cylindrée du moteur du véhicule (en pouces cubes)",ylab="Fréquences")
+```
+L'histogramme montre que l'étalement des données de cylindrée du moteur du véhicule est étalé de 100 pouces cubes à 500 pouces cubes. On s'aperçoit aussi la fréquence des données est plus grande lorsque l'on se situe vers la gauche. Ainsi, la majorité des données se situent à l'extrémité gauche.
+```{r}
+#diagramme de tukey
+boxplot(mondata$displacement,col="lightblue", horizontal=TRUE, notch = TRUE, main=paste("Diagrame de Turkey pour La cylindrée du moteur du véhicule"), xlab="La cylindrée du moteur du véhicule (en pouces cubes)")
+```
+Le diagramme de Tukey montre que le minimum de la cylindrée du moteur du véhicule en pouces cube est inférieure à 100 pouces cubes et que sa valeur maximale est à peu près 450 pouces cubes. La médiane de la cylindrée du moteur avoisine 140 pouces/cubes. Tandis que celle du premier quartile est à peu près à 100 pouces cubes et celle du troisième quartile est à peu près 250 pouces cubes. La distribution est positivement asymétrique, car la portion droite de la boîte et la moustache droite sont plus longues qu’à gauche de la médiane.
+```{r}
+#Droite de henry
+
+qqnorm(mondata$displacement, col="lightblue", main=paste("Droite de Henry pour La cylindrée du moteur du véhicule"), xlab="Quantile théorique",ylab="Quantile réelle")
+qqline(mondata$displacement, col="orange", lwd=2)
+```
+La droite de Henry nous permet d'évaluer la normalité de la distribution. On s'aperçoit que la majorité des données ne touchent pas la ligne orange, ce qui signifie que la majorité des valeurs ne suivent pas une loi normal. Pour confirmer mon hypothèse, il est possible de faire d'autres tests comme celui de shapiro pour en avoir la certitude.
+
+```{r}
+#Test de Shapiro
+shapiro.test(mondata$displacement)
+```
+Le test de Shapiro nous renseigne sur la normalité de la variable en question c'est à dire l'efficacité en carburant du véhicule. La valeur de p obtenue est 1.2e-13, elle est extrêmement inférieure à 0.05 ce qui signifie que nous ne pouvons pas supposer la normalité.
+```{r}
+Quartile <- quantile(mondata$displacement)
+Moyenne <- mean(mondata$displacement) 
+ÉcartType <- sd(mondata$displacement)
+ErreurType <- ÉcartType/ sqrt(length(mondata$displacement))
+quantile(mondata$displacement)
+InterValleDeConfiance <- t.test(mondata$displacement, conf.level = 0.95)
+InterValleDeConfiance.min = c(80.9)
+InterValleDeConfiance.max = c(390.5)
+table <- data.frame( Moyenne=Moyenne,
+      "Écart Type"= ÉcartType ,
+      "Erreur Type"= ErreurType,
+      "min IDC" = InterValleDeConfiance.min,
+      "max IDC"= InterValleDeConfiance.max,
+      "min"=Quartile[1],
+      "p25"= Quartile[2],
+      "Mediane"= Quartile[3],
+      "p75"= Quartile[4], 
+      "max"= Quartile[5],
+      row.names = "displacement")
+table
+```
+La moyenne est un indicateur de position d'un échantillon car c'est la valeur unique que tous devrait avoir pour que leur total soit inchangé. Dans notre cas elle est de 183.275 L'écart type quant à lui représente la dispersion des données autour de la moyenne et dans notre cas celui-ci est de 103.0308. L'écart type est élevés donc les données sont très dispersés. L'erreur type représente l'écart approximatif d'un échantillon et puisque 6.946336 est élevé alors l'estimation de la moyenne n'est pas précise. L'intervalle de confiance à un niveau de confiance de 95% ce qui veut dire que la moyenne de l'efficacité en carburant se situe à 95% entre les deux valeurs de min.IDC et max.IDC. Ainsi, cette valeur se situe entre 80.9 et 390.5. Les quartiles sont respectivement p25 qui représentent 25% de l'échantillon est à 98 pouces cubes, la médiane qui représente le point milieu d'un échantillon est de 137.5, le p75 représentent 75% de la population et est fixé à 250 pouces cubes.
+
+Graphique et tableaux associés associé au poids du véhicule :
+```{r}
+#histogramme
+hist(mondata$weight, col="lightgreen",border="black", main=paste("Histogramme de la distribution des masses des véhicules"),
+     xlab="Le poids du véhicule (en livres)",ylab="Fréquences")
+```
+L'histogramme montre que l'étalement des données Le poids du véhicule (en livres) est étalé de 2000 livres à 5000 livres. On peut estimer que la moyenne sera très près de 3000.
+
+```{r}
+#Diagramme de Tukey
+boxplot(mondata$weight,col="lightgreen", horizontal=TRUE, main=paste("Diagrame de Turkey pour le poids du véhicule"), xlab="Le poids du véhicule (en livres)")
+```
+Le diagramme de Tukey montre que le poid minimum dvéhicule en livre est un peu plus de 1500 livres et que sa valeur maximale est à peu près 5000 livres. La médiane poid du véhicule avoisine 2650 livres. Tandis que celle du premier quartile est à peu près 2200 livres et celle du troisième quartile est un peu inférieure à 3500 livres. La distribution est positivement asymétrique, car la portion droite de la boîte et la moustache droite sont plus longues qu’à gauche de la médiane.
+```{r}
+#Droite de Henry
+qqnorm(mondata$weight, col="lightgreen", main=paste("Droite de Henry pour le poids du véhicule (en livres)"), xlab="Quantile théorique",ylab="Quantile réelle")
+qqline(mondata$weight, col="brown", lwd=2)
+```
+La droite de Henry nous permet d'évaluer la normalité de la distribution. On s'aperçoit que beaucoup de données ne touchent pas la ligne rouge, ce qui signifie que la distribution pour le poid ne suit pas une loi normal. Pour confirmer mon hypothèse, il est possible de faire d'autres tests comme celui de shapiro pour en avoir la certitude.
+```{r}
+#test de shapiro
+shapiro.test(mondata$weight)
+```
+Le test de Shapiro nous renseigne sur la normalité de la variable en question c'est à dire l'efficacité en carburant du véhicule. La valeur de p obtenue est 9.109e-09 est inférieure à 0.05 ce qui signifie que nous ne pouvons pas supposer la normalité. Ainsi, on confirme l'hypothèse posé précèdement. 
+```{r}
+#tableau statistiques
+Quartile <- quantile(mondata$weight)
+Moyenne <- mean(mondata$weight) 
+ÉcartType <- sd(mondata$weight)
+ErreurType <- ÉcartType/ sqrt(length(mondata$weight))
+quantile(mondata$weight,c(.05,.95))
+InterValleDeConfiance <- t.test(mondata$weight, conf.level = 0.95)
+InterValleDeConfiance.min = c(1866.15)
+InterValleDeConfiance.max = c(4498.05)
+table <- data.frame( Moyenne=Moyenne,
+      "Écart Type"= ÉcartType ,
+      "Erreur Type"= ErreurType,
+      "min IDC" = InterValleDeConfiance.min,
+      "max IDC"= InterValleDeConfiance.max,
+      "min"=Quartile[1],
+      "p25"= Quartile[2],
+      "Mediane"= Quartile[3],
+      "p75"= Quartile[4], 
+      "max"= Quartile[5],
+      row.names = "weight")
+table
+```
+La moyenne est un indicateur de position d'un échantillon car c'est la valeur unique que tous devrait avoir pour que leur total soit inchangé. Dans notre cas elle est de 2904.159 livres. L'écart type quant à lui représente la dispersion des données autour de la moyenne et dans notre cas celui-ci est de 849.6087. L'écart type est élevés donc les données sont très dispersés. L'erreur type représente l'écart approximatif d'un échantillon et puisque 57.2806 est élevé alors l'estimation de la moyenne n'est pas précise. L'intervalle de confiance à un niveau de confiance de 95% ce qui veut dire que la moyenne de poid d'un véhicule se situe à 95% entre les deux valeurs de min.IDC et max.IDC. Ainsi, cette valeur se situe entre 1866.15 et 4498.05 Les quartiles sont respectivement p25 qui représentent 25% de l'échantillon est à 2169.25 livres, la médiane qui représente le point milieu d'un échantillon est de 2671 livres, le p75 représentent 75% de la population et est fixé à 3455.25 livres.
+
+
+Analyses pour vérifier si l'efficacité en carburant d’un véhicule dépend de l’origine de celui-ci et donnez une brève conclusion :
+
+```{r}
+#deux histogrammes juxtaposés
+layout(matrix(1:2,1,2))
+hist(mondata$mpg[mondata$origin=="0"], col="yellow",border="cyan", 
+     main=paste("Autre Pays"),xlab="L’efficacité en carburant du véhicule (en milles par gallon)",ylab="Fréquence")
+hist(mondata$mpg[mondata$origin=="1"], col="green",border="red", 
+     main=paste("États-Unis"),xlab="L’efficacité en carburant du véhicule (en milles par gallon)",ylab="Fréquence")
+```
+Les deux histogrammes juxtaposés nous indiquent que la distribution pour l'efficacité en carburant du véhicule pour des véhicules provenant d'autres pays montrent un peu une forme de cloche, ainsi on peut considérer que la distribution est approximativement normal. La fréquence pour l'efficacité en carburant des véhicules provenant des états unis sont majoritairement situé à l'extrémité gauche. Ainsi, la majorité des données se situent à l'extrémité gauche. La moyenne de l'efficacité en carburant du véhicule pour les véhicules provenant d'autres pays se situent à peu près à 30 milles/gallons alors que ceux provenant des états-unis se situe à peu près à 20 milles/gallons.
+```{r}
+#deux diagrammes de Tukey (ou «Box Plot») juxtaposés
+boxplot(mondata$mpg~mondata$origin,
+col=c("lightpink","lightblue"),
+horizontal=TRUE,
+notch=TRUE,
+main=paste("Efficacité en carburant du véhicule"),
+ylab="Origine",
+xlab="L’efficacité en carburant du véhicule (en milles par gallon)",
+las=1)
+```
+Les deux diagrammes de Tukey juxtaposée corroborent mes propos précédents. l'efficacité en carburant du véhicule provenant d'autre pays est approximativement symétrique, car les deux moitiés de la boîte sont de longueurs sensiblement égales. Tandis que l'efficacité en carburant du véhicule provenant des États-Unis à une distribution positivement asymétrique, car la portion droite de la boîte et la moustache droite sont plus longues qu’à gauche de la médiane. De plus, la médiane pour l'efficacité en carburant du véhicule provenant d'autre pays est à peu près de 29 contrairement à celle des véhicule provenant des états unis qui est de 20. 
+
+```{r}
+#un tableau des statistiques descriptives pour groupe 0
+Quartile <- quantile(mondata$mpg[mondata$origin=="0"])
+Variance <- var(mondata$mpg[mondata$origin=="0"])
+Moyenne <- mean(mondata$mpg[mondata$origin=="0"]) 
+ÉcartType <- sd(mondata$mpg[mondata$origin=="0"])
+ErreurType <- ÉcartType/ sqrt(length(mondata$mpg[mondata$origin=="0"]))
+quantile(mondata$mpg[mondata$origin=="0"],c(.05,.95))
+InterValleDeConfiance <- t.test(mondata$mpg[mondata$origin=="0"], conf.level = 0.95)
+InterValleDeConfiance.min = c(18.80)
+InterValleDeConfiance.max = c(39.82)
+table <- data.frame( Moyenne=Moyenne,
+      "Écart Type"= ÉcartType ,
+      "Erreur Type"= ErreurType,
+      "Variance"= Variance,
+      "min IDC" = InterValleDeConfiance.min,
+      "max IDC"= InterValleDeConfiance.max,
+      "min"=Quartile[1],
+      "p25"= Quartile[2],
+      "Mediane"= Quartile[3],
+      "p75"= Quartile[4], 
+      "max"= Quartile[5],
+      row.names = "Autres pays")
+table
+```
+
+```{r}
+#un tableau des statistiques descriptives pour groupe 1
+Quartile <- quantile(mondata$mpg[mondata$origin=="1"])
+Moyenne <- mean(mondata$mpg[mondata$origin=="1"]) 
+Variance <- var(mondata$mpg[mondata$origin=="1"])
+ÉcartType <- sd(mondata$mpg[mondata$origin=="1"])
+ErreurType <- ÉcartType/ sqrt(length(mondata$mpg[mondata$origin=="1"]))
+InterValleDeConfiance <- t.test(mondata$mpg[mondata$origin=="1"], conf.level = 0.95)
+InterValleDeConfiance.min = c(12.00)
+InterValleDeConfiance.max = c(33.25)
+table <- data.frame( "Moyenne" =Moyenne,
+      "Écart Type"= ÉcartType ,
+      "Erreur Type"= ErreurType,
+      "Variance"= Variance,
+      "min IDC" = InterValleDeConfiance.min,
+      "max IDC"= InterValleDeConfiance.max,
+      "min"=Quartile[1],
+      "p25"= Quartile[2],
+      "Mediane"= Quartile[3],
+      "p75"= Quartile[4], 
+      "max"= Quartile[5],
+      row.names = "États-Unis")
+table
+```
+```{r}
+
+Quartile0 <- quantile(mondata$mpg[mondata$origin=="0"])
+Moyenne0 <- mean(mondata$mpg[mondata$origin=="0"]) 
+ÉcartType0 <- sd(mondata$mpg[mondata$origin=="0"])
+ErreurType0 <- ÉcartType/ sqrt(length(mondata$mpg[mondata$origin=="0"]))
+InterValleDeConfiance0 <- t.test(mondata$mpg[mondata$origin=="0"], conf.level = 0.95)
+InterValleDeConfiance0.min = c(18.80)
+InterValleDeConfiance0.max = c(39.82)
+
+Quartile1 <- quantile(mondata$mpg[mondata$origin=="1"])
+Moyenne1 <- mean(mondata$mpg[mondata$origin=="1"]) 
+ÉcartType1 <- sd(mondata$mpg[mondata$origin=="1"])
+ErreurType1 <- ÉcartType/ sqrt(length(mondata$mpg[mondata$origin=="1"]))
+InterValleDeConfiance1 <- t.test(mondata$mpg[mondata$origin=="1"], conf.level = 0.95)
+InterValleDeConfiance1.min = c(12.00)
+InterValleDeConfiance1.max = c(33.25)
+varianceDesOrigines <- by(mondata$mpg, mondata$origin, function(x) var(x))
+varianceDesOrigines
+
+table <- data.frame( Moyenne=c(Moyenne0,Moyenne1),
+      "Écart Type"= c(ÉcartType0, ÉcartType1) ,
+      "Erreur Type"= c(ErreurType0, ErreurType1) ,
+      "min IDC" = c(InterValleDeConfiance0.min,InterValleDeConfiance1.min) ,
+      "max IDC"= c(InterValleDeConfiance0.max,InterValleDeConfiance1.max),
+      "Variance" = c(varianceDesOrigines[1], varianceDesOrigines[2]),
+      "min"=c(Quartile0[1], Quartile1[1]),
+      "p25"= c(Quartile0[2], Quartile1[2]),
+      "Mediane"= c(Quartile0[3], Quartile1[3]),
+      "p75"= c(Quartile0[4], Quartile1[4]), 
+      "max"= c(Quartile0[5], Quartile1[5]),
+      row.names = c("Autres Pays", "États-Unis"))
+table
+```
+la moyenne et la moyenne pour L’efficacité en carburant du véhicule (en milles par gallon) est supérieure lorsque la provenance du pays est les états-unis est inférieure à lorqu'elle provient d'autres pays. Dans les deux cas, la moyenne et la médiane sont quasiment pareille dans les deux cas et particulièrement lorsque la provenance du véhicule est d'autres pays, on peut ainsi en déuire que la distribution est symétrique. L'écart type, l'erreur type est sensiblement pareille pour les deux groupes. On peut en conclure que l'efficacité en carburant est meilleur lorsque l'origine est d'autres pays. La moyenne plus grande et les valeurs min et max de l'intervalle de confiance sont supérieure à celle des États-Unis. Ainsi, les résultats sont préférables lorsque la provenance est d'autres pays. 
+```{r}
+var.test(mpg~origin, data=mondata)
+varianceDesOrigines <- by(mondata$mpg, mondata$origin, function(x) var(x))
+varianceDesOrigines
+```
+
+Le test d’hypothèses sur l’égalité des variances des deux groupes. hypothèses Ho : Les deux variances sont égales Hypothèse H1 : Les deux variances ne sont pas égales. La p-value des 2 variances est de 0.787  et puisqu'elle est plus grande que 0.05, l'hypothèse sur l'égalité des deux variances est accepté. 
+```{r}
+t.test(mpg~origin, data=mondata)
+moyenneDesOrigines <- by(mondata$mpg, mondata$origin, function(x) mean(x))
+moyenneDesOrigines
+```
+
+Le test d'hypothèse sur l'égalité des moyennes des deux groupes. Hypothèses: Ho : Les deux moyennes sont égales. H1 : Les deux moyennes ne sont pas égales. La p-value des 2 moyennes est inférieure à 2.2e-16 et puisqu'elle est inférieure à 0.05, l'hypothèse sur l'égalité des deux moyennes est rejetté. 
+
+Recherche d'un modèle :
+Modèle 1
+```{r}
+#Modèle 1
+modele1 <- lm(mondata$mpg~mondata$displacement)
+summary(modele1)
+```
+Test de signification du modèle 1 :
+```{r}
+#modele 1
+anova(modele1)
+shapiro.test(residuals(modele1))
+par(mfrow=c(2,2))
+plot(modele1)
+
+table <- data.frame("B0"=c(34.941400),
+                    "B1"=c(-0.059838),
+                    row.names = "valeur")
+table
+```
+Intervalle de confiance du modèle 1 :
+```{r}
+#modele 1
+confint(modele1, level = 0.95)
+table <- data.frame("min"=c(33.6393701,-0.0660344),
+                    "max"=c(36.24343031, -0.05364209),
+                    row.names = c("B0", "B1"))
+table
+```
+On voit dans le graphique Normal Q-Q que la distribution suit une loi normal car les points se situent sur la droite. De plus, la valeur de R squared est 0.6243 ce qui n'est pas si loin de 1 donc le modèle est valable. La valeur de p dans le tableau d'analyse de la variance est 2.2e-16 et puisque la p value est inférieure à 0.05, on rejette l'hypothès qui dit que B1 = 0 et on accepte celle qui dit que B1 n'est pas égale à 0. La cylindré du moteur du véhicule à un grand impact sur l'efficacité en carburant du véhicule. La valeur de p dans le test de shapiro est de 0.0002219 ce qui inférieur à 0.05 ce qui veut dire qu'on rejette H0 et on peut en conclure que les résidus ne suivent pas une loi normale. On infirme ainsi l'information du graphique normal Q-Q. De plus, la dispersion des résidus dans les 3 autres graphiques permettent de confirmer que le modèle n'est pas homogène donc de ce fait même invalide.
+
+
+Modèle2
+```{r}
+#Modèle 2
+modele2 <- lm(mondata$mpg~((mondata$displacement)^2))
+summary(modele2)
+```
+Test de signification du modèle 2 :
+```{r}
+#modèle 2
+anova(modele2)
+shapiro.test(residuals(modele2))
+par(mfrow=c(2,2))
+plot(modele2)
+table <- data.frame("B0"=c(34.941400),
+                    "B1"=c(-0.059838),
+                    row.names = "valeur")
+table
+```
+On voit dans le graphique Normal Q-Q que la distribution suit une loi normal car les points se situent sur la droite. De plus, la valeur de R squared est 0.6243 ce qui n'est pas si loin de 1 donc le modèle est valable. La valeur de p dans le tableau d'analyse de la variance est 2.2e-16 et puisque la p value est inférieure à 0.05, on rejette l'hypothès qui dit que B1 = 0 et on accepte celle qui dit que B1 n'est pas égale à 0. La cylindré du moteur du véhicule à un grand impact sur l'efficacité en carburant du véhicule. La valeur de p dans le test de shapiro est de 0.0002219 ce qui inférieur à 0.05 ce qui veut dire qu'on rejette H0 et on peut en conclure que les résidus ne suivent pas une loi normale. On infirme ainsi l'information du graphique normal Q-Q. De plus, la dispersion des résidus dans les 3 autres graphiques permettent de confirmer que le modèle n'est pas homogène donc de ce fait même invalide.
+
+
+Modèle 3
+```{r}
+#Modèle 3
+modele3 <- lm(log(mondata$mpg)~log(mondata$displacement))
+summary(modele3)
+
+```
+Test de signification du modèle 3 :
+```{r}
+anova(modele3)
+shapiro.test(residuals(modele3))
+par(mfrow=c(2,2))
+plot(modele3)
+table <- data.frame("B0"=c(5.83420),
+                    "B1"=c(-0.059838),
+                    row.names = "valeur")
+table
+```
+On voit dans le graphique Normal Q-Q que la distribution suit une loi normal car les points se situent sur la droite. De plus, la valeur de R squared est 0.7193 ce qui n'est pas si loin de 1 donc le modèle est valable. La valeur de p dans le tableau d'analyse de la variance est 2.2e-16 et puisque la p value est inférieure à 0.05, on rejette l'hypothèse qui dit que B1 = 0 et on accepte celle qui dit que B1 n'est pas égale à 0. La cylindré du moteur du véhicule à un grand impact sur l'efficacité en carburant du véhicule. La valeur de p dans le test de shapiro est de 0.04617 ce qui est légèrement inférieur à 0.05 ce qui veut dire qu'on rejette H0 et on peut en conclure que les résidus ne suivent pas une loi normale. On infirme ainsi l'information du graphique normal Q-Q car la majorité des points se trouvaient sur la droite sauf ceux à l'extrémité gauche. De plus, la dispersion des résidus dans les 3 autres graphiques permettent de confirmer que le modèle n'est pas homogène donc de ce fait même invalide.
+
+
+Modèle 4
+```{r}
+#Modèle 4
+modele4 <- lm(log(mondata$mpg)~mondata$displacement)
+summary(modele4)
+```
+test de signification du modèle 4:
+```{r}
+#modèle 4
+anova(modele4)
+
+shapiro.test(residuals(modele4))
+par(mfrow=c(2,2))
+plot(modele4)
+table <- data.frame("B0"=c(3.629096),
+                    "B1"=c(-0.002765),
+                    row.names = "valeur")
+table
+```
+On voit dans le graphique Normal Q-Q que la distribution suit une loi normal car les points se situent sur la droite. De plus, la valeur de R squared est 0.7158 ce qui n'est pas si loin de 1 donc le modèle est valable. La valeur de p dans le tableau d'analyse de la variance est 2.2e-16 et puisque la p value est inférieure à 0.05, on rejette l'hypothès qui dit que B1 = 0 et on accepte celle qui dit que B1 n'est pas égale à 0. La cylindré du moteur du véhicule à un grand impact sur l'efficacité en carburant du véhicule. La valeur de p dans le test de shapiro est de 0.7515 ce qui supérieure à 0.05 ce qui veut dire qu'on accepte H0 et on peut en conclure que les résidus suivent une loi normale. On confirme ainsi l'information du graphique normal Q-Q.
+
+
+Modèle 5
+```{r}
+#Modèle 5
+modele5 <- lm(mondata$mpg~mondata$weight)
+summary(modele5)
+```
+Test de signification du modèle 5:
+```{r}
+#Modèle 5
+anova(modele5)
+
+shapiro.test(residuals(modele5))
+par(mfrow=c(2,2))
+plot(modele5)
+
+table <- data.frame("B0"=c(46.0168548),
+                    "B1"=c(-0.0075899),
+                    row.names = "valeur")
+table
+```
+Intervalle de confiance du modèle 5 :
+```{r}
+confint(modele5, level = 0.95)
+table <- data.frame("min"=c(43.928716550,-0.008280127),
+                    "max"=c(48.104993046, -0.006899695),
+                    row.names = c("B0", "B1"))
+table
+```
+On voit dans le graphique Normal Q-Q que la distribution ne suit pas une loi normal car les points situés à l'extrémité droite ne touchent pas la droite. De plus, la valeur de R squared est 0.683 ce qui n'est pas si loin de 1 donc le modèle est valable. La valeur de p dans le tableau d'analyse de la variance est 2e-16 et puisque la p value est inférieure à 0.05, on rejette l'hypothès qui dit que B1 = 0 et on accepte celle qui dit que B1 n'est pas égale à 0. Le poids en livre du véhicule à un grand impact sur l'efficacité en carburant du véhicule. La valeur de p dans le test de shapiro est de 2.07e-05 ce qui inférieur à 0.05 ce qui veut dire qu'on rejette H0 et on peut en conclure que les résidus ne suivent pas une loi normale. On confirme ainsi l'information du graphique normal Q-Q.
+
+Modèle 6
+```{r}
+#Modèle 6
+modele6 <- lm(mondata$mpg~(mondata$weight)^2)
+summary(modele6)
+```
+Tet de signification du modèle 6:
+```{r}
+#Modèle 6
+anova(modele6)
+
+shapiro.test(residuals(modele6))
+par(mfrow=c(2,2))
+plot(modele6)
+table <- data.frame("B0"=c(46.0168548),
+                    "B1"=c(-0.0075899),
+                    row.names = "valeur")
+table
+```
+On voit dans le graphique Normal Q-Q que la distribution ne suit pas une loi normal car les points se situant à l'extrémité droite ne sont pas sur la droite. De plus, la valeur de R squared est 0.683 ce qui n'est pas si loin de 1 donc le modèle est valable. La valeur de p dans le tableau d'analyse de la variance est 2e-16 et puisque la p value est inférieure à 0.05, on rejette l'hypothès qui dit que B1 = 0 et on accepte celle qui dit que B1 n'est pas égale à 0. Le poids en livre du véhicule à un grand impact sur l'efficacité en carburant du véhicule. La valeur de p dans le test de shapiro est de 2.07e-05 ce qui inférieur à 0.05 ce qui veut dire qu'on rejette H0 et on peut en conclure que les résidus ne suivent pas une loi normale. On confirme ainsi l'information du graphique normal Q-Q.
+
+
+Modèle 7
+```{r}
+#Modèle 7
+modele7 <- lm(log(mondata$mpg)~log(mondata$weight))
+summary(modele7)
+```
+test de signification du modèle 7:
+```{r}
+#modèle 7
+anova(modele7)
+
+shapiro.test(residuals(modele7))
+par(mfrow=c(2,2))
+plot(modele7)
+
+table <- data.frame("B0"=c(11.39849),
+                    "B1"=c(-1.04320),
+                    row.names = "valeur")
+table
+```
+
+On voit dans le graphique Normal Q-Q que la distribution ne suit pas une loi normal car les points se situant aux extrémités ne sont pas sur la droite. De plus, la valeur de R squared est 0.7655 ce qui n'est pas si loin de 1 donc le modèle est valable. La valeur de p dans le tableau d'analyse de la variance est 2e-16 et puisque la p value est inférieure à 0.05, on rejette l'hypothès qui dit que B1 = 0 et on accepte celle qui dit que B1 n'est pas égale à 0. Le poids en livre du véhicule à un grand impact sur l'efficacité en carburant du véhicule. La valeur de p dans le test de shapiro est de 0.01028 ce qui inférieur à 0.05 ce qui veut dire qu'on rejette H0 et on peut en conclure que les résidus ne suivent pas une loi normale. On confirme ainsi l'information du graphique normal Q-Q. 
+
+
+Modèle 8
+```{r}
+#Modèle 8
+X2= mondata$weight
+modele8 <- lm(log(mondata$mpg)~X2)
+summary(modele8)
+```
+Test de signification du modèle 8:
+```{r}
+anova(modele8)
+
+shapiro.test(residuals(modele8))
+par(mfrow=c(2,2))
+plot(modele8)
+
+table <- data.frame("B0"=c(4.130e+00),
+                    "B1"=c(-3.469e-04),
+                    row.names = "valeur")
+table
+```
+On voit dans le graphique Normal Q-Q que la distribution ne suit pas une loi normal car les points se situant aux deux extrémités ne sont pas sur la droite. De plus, la valeur de R squared est 0.7661 ce qui n'est pas si loin de 1 donc le modèle est valable. La valeur de p dans le tableau d'analyse de la variance est 2e-16 et puisque la p value est inférieure à 0.05, on rejette l'hypothès qui dit que B1 = 0 et on accepte celle qui dit que B1 n'est pas égale à 0. Le poids en livre du véhicule à un grand impact sur l'efficacité en carburant du véhicule. La valeur de p dans le test de shapiro est de 0.08367 ce qui est supérieur à 0.05 ce qui veut dire qu'on accepte H0 et on peut en conclure que les résidus suivent une loi normale. On infirme ainsi l'information du graphique normal Q-Q.
+
+La comparaison des 8 modèles nous indiquent que le modèle à préconiser est ainsi le modèle 8. Il a la valeur de R carrée la plus proche de 1 ce qui veut dire que c'est le modèle le plus valable. De plus, le poids en livre à un impact important sur la l'efficacité en carburant du véhicule et les résidus suivent une loi normale. 
+
+Calculez un intervalle de prévision pour l’efficacité en carburant d’un véhicule ayant les caractéristiques suivantes : X1 = 190; X2 = 2500.
+
+```{r}
+#le meilleur modèle est le modèle 8
+
+predict(modele8, data.frame(X2=2500), level = 0.95, interval="prediction")
+exp(3.262535)
+exp(2.939969)
+exp(3.585101)
+```
+
+Le modèle 8 prédit que l'intervalle de prévision est de [18.91526; 36.057]. Cet intervalle pour L’efficacité en carburant du véhicule (en milles par gallon) est relativement grand mais les données coîncide avec les valeurs de l'échantillon. J'en conclus que le modèle 8 est valables et mais qu'il faudrait considérer plus de facteurs pour avoir un intervalle réduit.

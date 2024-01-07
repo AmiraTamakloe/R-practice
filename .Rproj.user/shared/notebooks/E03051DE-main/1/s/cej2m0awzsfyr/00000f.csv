@@ -1,0 +1,3 @@
+"0","#Droite de henry"
+"0",""
+"0","qqnorm(mondata$displacement, col=""lightblue"", main=paste(""Droite de Henry pour La cylindrée du moteur du véhicule""), xlab=""Quantile théorique"",ylab=""Quantile réelle"")"

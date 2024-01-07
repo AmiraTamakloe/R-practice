@@ -1,0 +1,2 @@
+"0","#Diagramme de Tukey"
+"0","boxplot(mondata$mpg,col=""lightpink"", horizontal=TRUE,notch=TRUE, main=paste(""Diagrame de Turkey pour l'efficacité en carburant du véhicule""), xlab=""L’efficacité en carburant du véhicule (en milles par gallon)"")"

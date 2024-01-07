@@ -1,0 +1,4 @@
+"0","#deux histogrammes juxtaposés"
+"0","layout(matrix(1:2,1,2))"
+"0","hist(mondata$mpg[mondata$origin==""0""], col=""yellow"",border=""cyan"", "
+"0","     main=paste(""Autre Pays""),xlab=""L’efficacité en carburant du véhicule (en milles par gallon)"",ylab=""Fréquence"")"

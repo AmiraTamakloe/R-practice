@@ -1,0 +1,2 @@
+"0","hist(mondata$mpg[mondata$origin==""1""], col=""green"",border=""red"", "
+"0","     main=paste(""États-Unis""),xlab=""L’efficacité en carburant du véhicule (en milles par gallon)"",ylab=""Fréquence"")"

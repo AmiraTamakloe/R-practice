@@ -1,0 +1,2 @@
+"0","#diagramme de tukey"
+"0","boxplot(mondata$displacement,col=""lightblue"", horizontal=TRUE, notch = TRUE, main=paste(""Diagrame de Turkey pour La cylindrée du moteur du véhicule""), xlab=""La cylindrée du moteur du véhicule (en pouces cubes)"")"
